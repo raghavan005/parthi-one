@@ -38,7 +38,7 @@ export function Admin() {
     try {
       const res = await fetch("/api/quotes");
       const data = await res.json();
-      setQuotes(data);
+      setQuotes(Array.isArray(data) ? data : []);
     } catch (e) {
       console.error(e);
     } finally {
