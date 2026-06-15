@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { neonQuery } from "../../lib/neon";
+import { updateRow } from "../../lib/neon";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== "PATCH") {
@@ -14,18 +14,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const result = await neonQuery(
-      "UPDATE quotes SET status = $1 WHERE id = $2 RETURNING id",
-      [status, Number(id)]
-    );
+    const rows = await updateRow("quotes", Number(id), { status });
 
-    if (result.length === 0) {
+    if (!rows || rows.length === 0) {
       return res.status(404).json({ error: "Quote not found" });
     }
 
     return res.status(200).json({ success: true });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: "Failed to update status" });
+    console.error("PATCH /api/quotes/[id]/status error:", error);
+    return res.status(500).json({ error: String(error) });
   }
 }

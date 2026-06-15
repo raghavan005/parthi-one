@@ -1,45 +1,47 @@
-// Helper to query Neon via its REST API
-// Set NEON_API_URL and NEON_API_KEY in your environment variables
+// Neon Data API client using PostgREST-compatible REST calls via fetch
+// NEON_API_URL  — e.g. https://ep-xxx.apirest.c-7.us-east-1.aws.neon.tech/neondb/rest/v1
+// NEON_API_KEY  — your Neon API key (from neon.tech → Account Settings → API Keys)
 
-const NEON_API_URL = process.env.NEON_API_URL!; // e.g. https://ep-xxx.apirest.c-7.us-east-1.aws.neon.tech/neondb/rest/v1
-const NEON_API_KEY = process.env.NEON_API_KEY!;  // your Neon API key
+const BASE = process.env.NEON_API_URL!;
+const KEY  = process.env.NEON_API_KEY!;
 
-export async function neonQuery(query: string, params: unknown[] = []) {
-  const res = await fetch(`${NEON_API_URL}/query`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${NEON_API_KEY}`,
-    },
-    body: JSON.stringify({ query, params }),
-  });
-
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`Neon REST error ${res.status}: ${text}`);
-  }
-
-  const data = await res.json();
-  // Neon REST API returns { rows: [...] }
-  return data.rows as Record<string, unknown>[];
+function headers(extra: Record<string, string> = {}) {
+  return {
+    "Content-Type": "application/json",
+    "Authorization": `Bearer ${KEY}`,
+    ...extra,
+  };
 }
 
-export async function ensureTable() {
-  await neonQuery(`
-    CREATE TABLE IF NOT EXISTS quotes (
-      id SERIAL PRIMARY KEY,
-      client_name TEXT NOT NULL,
-      business_name TEXT NOT NULL,
-      mobile_number TEXT NOT NULL,
-      email TEXT NOT NULL,
-      material TEXT NOT NULL,
-      specs_width TEXT NOT NULL,
-      specs_height TEXT NOT NULL,
-      handle_type TEXT NOT NULL,
-      quantity TEXT NOT NULL,
-      printed_logo TEXT NOT NULL,
-      status TEXT NOT NULL DEFAULT 'New',
-      created_at TIMESTAMPTZ DEFAULT NOW()
-    )
-  `);
+// SELECT all rows from a table, ordered by created_at DESC
+export async function selectAll(table: string) {
+  const res = await fetch(`${BASE}/${table}?order=created_at.desc`, {
+    headers: headers(),
+  });
+  if (!res.ok) throw new Error(`GET ${table} failed: ${await res.text()}`);
+  return res.json();
+}
+
+// INSERT a row and return the created row (with id)
+export async function insertRow(table: string, data: Record<string, unknown>) {
+  const res = await fetch(`${BASE}/${table}`, {
+    method: "POST",
+    headers: headers({ "Prefer": "return=representation" }),
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error(`POST ${table} failed: ${await res.text()}`);
+  const rows = await res.json();
+  return rows[0];
+}
+
+// UPDATE a row by id
+export async function updateRow(table: string, id: number, data: Record<string, unknown>) {
+  const res = await fetch(`${BASE}/${table}?id=eq.${id}`, {
+    method: "PATCH",
+    headers: headers({ "Prefer": "return=representation" }),
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error(`PATCH ${table} id=${id} failed: ${await res.text()}`);
+  const rows = await res.json();
+  return rows;
 }
