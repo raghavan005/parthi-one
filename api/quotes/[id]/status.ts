@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { updateRow } from "../../lib/neon";
+import { updateStatus } from "../../lib/turso";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== "PATCH") {
@@ -14,9 +14,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const rows = await updateRow("quotes", Number(id), { status });
+    const rowsAffected = await updateStatus(Number(id), status);
 
-    if (!rows || rows.length === 0) {
+    if (rowsAffected === 0) {
       return res.status(404).json({ error: "Quote not found" });
     }
 

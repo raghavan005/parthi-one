@@ -1,12 +1,12 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { selectAll, insertRow } from "./lib/neon";
+import { selectAll, insertQuote } from "./lib/turso";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   // GET /api/quotes — fetch all quotes
   if (req.method === "GET") {
     try {
-      const quotes = await selectAll("quotes");
+      const quotes = await selectAll();
       return res.status(200).json(quotes);
     } catch (error) {
       console.error("GET /api/quotes error:", error);
@@ -30,7 +30,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         printed_logo,
       } = req.body;
 
-      const row = await insertRow("quotes", {
+      const row = await insertQuote({
         client_name,
         business_name: business_name || "N/A",
         mobile_number,
@@ -41,7 +41,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         handle_type,
         quantity,
         printed_logo,
-        status: "New",
       });
 
       return res.status(201).json({ success: true, id: row.id });
