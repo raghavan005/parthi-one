@@ -1,0 +1,38 @@
+export const products = [
+  {
+    id: "prod-1",
+    name: "Non-Woven Grocery Bag",
+    specs: "W-Cut, 60 GSM",
+    basePrice: 4.5,
+    description: "Standard industrial grocery bag for daily retail use. Economical and spacious.",
+    tag: "Economy",
+    imageUrl: "/plain-non-woven-carry-bag.jpg",
+  },
+  {
+    id: "prod-2",
+    name: "Non-Woven Boutique Bag",
+    specs: "D-Cut, 100 GSM",
+    basePrice: 8.0,
+    description: "Premium finish bag, ideal for retail clothing, boutique stores, and exhibitions.",
+    tag: "Premium",
+    imageUrl: "/non-woven-d-cut-bag-500x500.webp",
+  },
+  {
+    id: "prod-3",
+    name: "Eco-Friendly Cotton Bag",
+    specs: "Plain, 120 GSM",
+    basePrice: 28.0,
+    description: "Reusable and biodegradable cotton bag for sustainable brands.",
+    tag: "Eco-Friendly",
+    imageUrl: "/natural-cloth-bag-cotton-d-mart-for-shopping-capacity-up-to-20-kg.jpg",
+  },
+  {
+    id: "prod-4",
+    name: "Heavy Laminated Jute Bag",
+    specs: "Laminated Canvas / Jute",
+    basePrice: 55.0,
+    description: "Highly durable bag for heavy goods and premium gifting.",
+    tag: "Heavy Duty",
+    imageUrl: "/canvas jute.jpg",
+  },
+];

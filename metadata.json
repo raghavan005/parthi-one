@@ -1,0 +1,6 @@
+{
+  "name": "B2B Bag Stitching Quote Portal",
+  "description": "Minimalist catalog, quoting stepper, and admin dashboard for an industrial bag factory.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
