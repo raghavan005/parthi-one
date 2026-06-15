@@ -77,7 +77,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         ],
       });
 
-      return res.status(201).json({ success: true, id: result.lastInsertRowid });
+      return res.status(201).json({ success: true, id: Number(result.lastInsertRowid) });
     } catch (error) {
       console.error("POST /api/quotes error:", error);
       return res.status(500).json({ error: String(error) });

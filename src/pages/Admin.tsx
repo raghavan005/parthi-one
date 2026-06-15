@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 // Removed unused import
-import { MessageSquare, Phone, X, Search, MoreVertical, Building2, User, Hash } from "lucide-react";
+import { MessageSquare, Phone, X, Search, Trash2, Building2, User } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "../lib/utils";
 
@@ -62,6 +62,17 @@ export function Admin() {
       if (selectedQuote?.id === id) {
         setSelectedQuote({ ...selectedQuote, status });
       }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const deleteQuote = async (id: number) => {
+    if (!confirm("Delete this quote? This cannot be undone.")) return;
+    try {
+      await fetch(`/api/quotes/${id}`, { method: "DELETE" });
+      setQuotes((prev) => prev.filter(q => q.id !== id));
+      setSelectedQuote(null);
     } catch (e) {
       console.error(e);
     }
@@ -205,12 +216,21 @@ export function Admin() {
                     {selectedQuote.status}
                   </span>
                 </div>
+              <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => deleteQuote(selectedQuote.id)}
+                    className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
+                    title="Delete quote"
+                  >
+                    <Trash2 size={18} />
+                  </button>
                 <button 
                   onClick={() => setSelectedQuote(null)}
                   className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors"
                 >
                   <X size={20} />
                 </button>
+              </div>
               </div>
 
               <div className="flex-1 overflow-y-auto p-6 space-y-6">
