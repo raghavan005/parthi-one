@@ -3,8 +3,12 @@ import { createClient } from "@libsql/client";
 // TURSO_DATABASE_URL — e.g. libsql://your-db-name-username.turso.io
 // TURSO_AUTH_TOKEN  — from: turso db tokens create your-db-name
 
+// Convert libsql:// to https:// for Vercel serverless (no WebSocket support)
+const rawUrl = process.env.TURSO_DATABASE_URL!;
+const httpUrl = rawUrl.replace(/^libsql:\/\//, "https://");
+
 const client = createClient({
-  url: process.env.TURSO_DATABASE_URL!,
+  url: httpUrl,
   authToken: process.env.TURSO_AUTH_TOKEN!,
 });
 
