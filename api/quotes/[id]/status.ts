@@ -1,5 +1,11 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { updateStatus } from "../../lib/turso";
+import { createClient } from "@libsql/client";
+
+function getClient() {
+  const rawUrl = process.env.TURSO_DATABASE_URL!;
+  const url = rawUrl.replace(/^libsql:\/\//, "https://");
+  return createClient({ url, authToken: process.env.TURSO_AUTH_TOKEN! });
+}
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== "PATCH") {
@@ -14,9 +20,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const rowsAffected = await updateStatus(Number(id), status);
+    const client = getClient();
+    const result = await client.execute({
+      sql: "UPDATE quotes SET status = ? WHERE id = ?",
+      args: [status, Number(id)],
+    });
 
-    if (rowsAffected === 0) {
+    if (result.rowsAffected === 0) {
       return res.status(404).json({ error: "Quote not found" });
     }
 
